@@ -30,8 +30,8 @@ import {
   LogoImage,
   LogoContainerBox,
 } from "./Navigation.styles";
-import ManageAccount from "../../components/ManageAccount";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import ManageAccount from "../../components/ManageAccount";
 
 const Navigation = () => {
   const {

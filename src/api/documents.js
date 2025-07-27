@@ -1,10 +1,10 @@
-import { publicAxios } from "./axios";
+import { authAxios } from "./axios";
 
 export const uploadDocument = async (file) => {
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await publicAxios.post("/documents/upload", formData, {
+  const response = await authAxios.post("/documents/upload", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
@@ -14,11 +14,11 @@ export const uploadDocument = async (file) => {
 };
 
 export const getDocuments = async (page = 1, perPage = 10) => {
-  const response = await publicAxios.get(`/documents?page=${page}&perPage=${perPage}`);
+  const response = await authAxios.get(`/documents?page=${page}&perPage=${perPage}`);
   return response.data; 
 };
 
 export const getDocumentById = async (id) => {
-  const response = await publicAxios.get(`/documents/${id}`);
+  const response = await authAxios.get(`/documents/${id}`);
   return response.data;
 };

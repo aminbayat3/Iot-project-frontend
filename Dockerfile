@@ -1,38 +1,50 @@
 # === Stage 1: Build the Vite frontend ===
 FROM node:20-slim AS build
 
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Accept a build-time argument for the API base URL (must be passed during build)
+# Accept build-time Firebase and API env variables
 ARG VITE_API_BASE_URL
+ARG VITE_FIREBASE_API_KEY
+ARG VITE_FIREBASE_AUTH_DOMAIN
+ARG VITE_FIREBASE_PROJECT_ID
+ARG VITE_FIREBASE_STORAGE_BUCKET
+ARG VITE_FIREBASE_MESSAGING_SENDER_ID
+ARG VITE_FIREBASE_APP_ID
+ARG VITE_FIREBASE_MEASUREMENT_ID
 
-# Export it as an environment variable so Vite can access it at build time
+# Set ENV vars so Vite can access them during build
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
-
-# Copy package definition files
-COPY package.json package-lock.json ./
+ENV VITE_FIREBASE_API_KEY=$VITE_FIREBASE_API_KEY
+ENV VITE_FIREBASE_AUTH_DOMAIN=$VITE_FIREBASE_AUTH_DOMAIN
+ENV VITE_FIREBASE_PROJECT_ID=$VITE_FIREBASE_PROJECT_ID
+ENV VITE_FIREBASE_STORAGE_BUCKET=$VITE_FIREBASE_STORAGE_BUCKET
+ENV VITE_FIREBASE_MESSAGING_SENDER_ID=$VITE_FIREBASE_MESSAGING_SENDER_ID
+ENV VITE_FIREBASE_APP_ID=$VITE_FIREBASE_APP_ID
+ENV VITE_FIREBASE_MEASUREMENT_ID=$VITE_FIREBASE_MEASUREMENT_ID
 
 # Install dependencies
+COPY package*.json ./
 RUN npm install
 
-# Copy the rest of the source code into the container
+# Copy all source files
 COPY . .
 
-# Build the Vite app with environment variables injected
+# Build Vite app
 RUN npm run build
 
-# === Stage 2: Serve the built app using Nginx ===
+# === Stage 2: Serve with Nginx ===
 FROM nginx:alpine
 
-# Copy a custom Nginx config file into the container
+# Copy custom Nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy the built frontend app from the build stage to the default Nginx directory
+# Copy built assets from previous stage
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Expose port 80 for HTTP traffic
+# Expose port
 EXPOSE 80
 
-# Start Nginx in the foreground
+# Start server
 CMD ["nginx", "-g", "daemon off;"]
