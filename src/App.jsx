@@ -1,35 +1,27 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Route, Routes } from "react-router-dom";
 
-function App() {
-  const [count, setCount] = useState(0)
+import HomePage from "./routes/HomePage";
+import Navigation from "./routes/navigation/Navigation.component";
+import DocumentPage from "./routes/DocumentPage";
+
+import { ThemeProvider } from "@mui/material";
+import { THEME_DATA } from "./constants/theme-names.constant";
+
+import useThemeStore from "./store/themeStore";
+
+const App = () => {
+  const themeKey = useThemeStore((state) => state.themeKey);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <ThemeProvider theme={THEME_DATA[themeKey].value}>
+      <Routes>
+        <Route path="/" element={<Navigation />}>
+          <Route index element={<HomePage />} />
+          <Route path="documents" element={<DocumentPage />} />
+        </Route>
+      </Routes>
+    </ThemeProvider>
+  );
+};
 
-export default App
+export default App;
