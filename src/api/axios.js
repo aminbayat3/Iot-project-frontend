@@ -13,10 +13,21 @@ export const authAxios = axios.create({
 
 // 🔑 Attach Firebase ID token from localStorage
 authAxios.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token"); // or from Zustand
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  const authData = localStorage.getItem("auth");
+
+  if (authData) {
+    try {
+      const parsed = JSON.parse(authData);
+      const token = parsed?.state?.token;
+
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (err) {
+      console.error("Failed to parse auth token:", err);
+    }
   }
+
   return config;
 });
 
@@ -25,8 +36,8 @@ authAxios.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
+      localStorage.removeItem("auth");
+      // window.location.href = "/login"; // optional: redirect user to login page
     }
     return Promise.reject(err);
   }
